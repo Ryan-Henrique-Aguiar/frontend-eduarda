@@ -4,7 +4,8 @@ import { tokenStorage } from '../utils/storage'
 export const http = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3333',
   timeout: 15000,
-  headers: { 'Content-Type': 'application/json' },
+  headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true'
+  },
 })
 
 http.interceptors.request.use((config) => {
