@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://freebee-pettiness-breeding.ngrok-free.dev/$1"
+    }
+  ]
+}
