@@ -48,7 +48,7 @@ export async function createLead(form: LeadFormData): Promise<Negociacao> {
 
   const contato = await http.post('/contatos', {
     empresaId: empresa.data.id,
-    nome: form.contatoNome,
+    nome: form.contatoNome || '',
     cargo: form.cargo || undefined,
     email: form.email || undefined,
     telefone: form.telefone || undefined,

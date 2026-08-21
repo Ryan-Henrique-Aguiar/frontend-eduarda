@@ -16,10 +16,20 @@ export function LeadFormModal({ open, onClose, onSubmit, loading }: {
   loading?: boolean
 }) {
   const [form, setForm] = useState<LeadFormData>(initial)
+  const [validationError, setValidationError] = useState('')
   const update = <K extends keyof LeadFormData>(key: K, value: LeadFormData[K]) => setForm((prev) => ({ ...prev, [key]: value }))
 
   async function submit(event: FormEvent) {
     event.preventDefault()
+    if (!form.empresaTelefone.trim() && !form.telefone.trim()) {
+      setValidationError('Informe o telefone da empresa ou o telefone do contato.')
+      return
+    }
+    if (form.tipoContato === 'gatekeeper' && form.faseAutomacaoInicial === 'PRONTO_DECISOR') {
+      setValidationError('Contatos Gatekeeper não podem iniciar na piscina de prontos para decisor.')
+      return
+    }
+    setValidationError('')
     await onSubmit(form)
     setForm(initial)
   }
@@ -41,14 +51,15 @@ export function LeadFormModal({ open, onClose, onSubmit, loading }: {
         <fieldset>
           <legend>Contato inicial</legend>
           <div className="form-grid">
-            <label className="field"><span>Nome *</span><input required maxLength={150} value={form.contatoNome} onChange={(e) => update('contatoNome', e.target.value)} /></label>
+            <label className="field"><span>Nome</span><input maxLength={150} value={form.contatoNome} onChange={(e) => update('contatoNome', e.target.value)} /></label>
             <label className="field"><span>Cargo</span><input value={form.cargo} onChange={(e) => update('cargo', e.target.value)} /></label>
             <label className="field"><span>E-mail</span><input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} /></label>
             <label className="field"><span>Telefone</span><input type="tel" value={form.telefone} onChange={(e) => update('telefone', e.target.value)} placeholder="+55..." /></label>
-            <label className="field"><span>Tipo do contato</span><select value={form.tipoContato} onChange={(e) => update('tipoContato', e.target.value as 'gatekeeper' | 'decisor')}><option value="gatekeeper">Gatekeeper</option><option value="decisor">Decisor</option></select></label>
-            <label className="field"><span>Piscina inicial</span><select value={form.faseAutomacaoInicial} onChange={(e) => update('faseAutomacaoInicial', e.target.value as FaseAutomacao)}><option value="BACKLOG">Backlog</option><option value="PRONTO_GATEKEEPER">Prontos para gatekeeper</option><option value="PRONTO_DECISOR">Prontos para decisor</option><option value="FINALIZADO">Finalização</option></select></label>
+            <label className="field"><span>Tipo do contato</span><select value={form.tipoContato} onChange={(e) => { const tipo = e.target.value as 'gatekeeper' | 'decisor'; update('tipoContato', tipo); if (tipo === 'gatekeeper' && form.faseAutomacaoInicial === 'PRONTO_DECISOR') update('faseAutomacaoInicial', 'BACKLOG') }}><option value="gatekeeper">Gatekeeper</option><option value="decisor">Decisor</option></select></label>
+            <label className="field"><span>Piscina inicial</span><select value={form.faseAutomacaoInicial} onChange={(e) => update('faseAutomacaoInicial', e.target.value as FaseAutomacao)}><option value="BACKLOG">Backlog</option><option value="PRONTO_GATEKEEPER">Prontos para gatekeeper</option><option value="PRONTO_DECISOR" disabled={form.tipoContato === 'gatekeeper'}>Prontos para decisor</option><option value="FINALIZADO">Finalização</option></select></label>
           </div>
         </fieldset>
+        {validationError && <div className="alert alert--error" role="alert">{validationError}</div>}
         <div className="modal-actions"><button type="button" className="button button--ghost" onClick={onClose}>Cancelar</button><button className="button button--primary" disabled={loading}>{loading ? 'Salvando...' : 'Adicionar lead'}</button></div>
       </form>
     </Modal>

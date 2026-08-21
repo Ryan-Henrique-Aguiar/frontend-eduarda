@@ -21,7 +21,11 @@ export function LeadCard({ lead, onOpen }: { lead: Negociacao; onOpen: (lead: Ne
       </div>
       <footer className="lead-card__footer">
         <span className={`interest interest--${(lead.nivelInteresse ?? 'SEM_INTERESSE').toLowerCase()}`}>{lead.nivelInteresse ? `Interesse ${lead.nivelInteresse.toLowerCase()}` : 'Não qualificado'}</span>
-        {success && <span className="success-dot" title="Resultado positivo" aria-label="Resultado positivo" />}
+        <div className="lead-card__indicators" aria-label="Indicadores de contato">
+          <span className={`status-dot ${lead.contato?.consentimentoLigacao ? 'status-dot--success' : 'status-dot--danger'}`} title={lead.contato?.consentimentoLigacao ? 'Consentimento para ligação' : 'Sem consentimento para ligação'} aria-label={lead.contato?.consentimentoLigacao ? 'Consentimento para ligação' : 'Sem consentimento para ligação'} />
+          <span className={`status-dot ${lead.contato?.naoLigarNovamente ? 'status-dot--danger' : 'status-dot--success'}`} title={lead.contato?.naoLigarNovamente ? 'Não ligar novamente' : 'Pode ligar novamente'} aria-label={lead.contato?.naoLigarNovamente ? 'Não ligar novamente' : 'Pode ligar novamente'} />
+          {success && <span className="success-dot" title="Resultado positivo" aria-label="Resultado positivo" />}
+        </div>
       </footer>
     </article>
   )
